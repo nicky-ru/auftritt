@@ -4,28 +4,36 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { sign, verify } from 'jsonwebtoken'
 
 export default NextAuth({
+    pages: {
+        // signIn: '/auth/signin',
+    },
     providers: [
         CredentialsProvider({
             id: 'metamask',
             name: 'Metamask',
             credentials: {
-                username: { label: "Username", type: "text", placeholder: "jsmith" },
-                email: {  label: "Email", type: "email", placeholder: "jsmith@mail.com" }
+                // name: { label: "nickname", type: "text"},
+                // email: { label: "email", type: "email"},
+                // image: { label: "image", type: "text"},
+                address: { label: "Address", type: "text"},
+                message: { label: "Message", type: "text"},
+                signature: { label: "Signature", type: "text"}
             },
             async authorize(credentials, req) {
-                return { id: 1, name: credentials?.username, email: credentials?.email }
 
-                // const res = await fetch("/your/endpoint", {
-                //     method: 'POST',
-                //     body: JSON.stringify(credentials),
-                //     headers: { "Content-Type": "application/json" }
-                // })
-                // const user = await res.json()
-                //
-                // if (res.ok && user) {
-                //     return user
-                // }
-                // return null
+                const verifyRes = await fetch('http://localhost:3000/api/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: credentials?.message, signature: credentials?.signature }),
+                })
+
+                if (verifyRes.ok && credentials) {
+                    return { address: credentials.address }
+                }
+
+                if (!verifyRes.ok) {} return null;
             }
         })
     ],
@@ -36,10 +44,10 @@ export default NextAuth({
                 params.token[namespace] = {
                     'x-hasura-default-role': 'user',
                     'x-hasura-allowed-roles': ['user'],
-                    'x-hasura-user-id': params?.token?.email
+                    'x-hasura-user-id': params?.token?.address
                 };
             }
-            return sign(params.token, params.secret)
+            return sign(params.token, params.secret, { algorithm: 'HS256'})
         },
 
         async decode(params): Promise<any | null> {
@@ -50,11 +58,6 @@ export default NextAuth({
     callbacks: {
         async signIn({ user, account, profile, email, credentials }) {
             const isAllowedToSignIn = true
-            // console.log("user", user)
-            // console.log("account", account)
-            // console.log("profile", profile)
-            // console.log('email', email)
-            // console.log('credentials', credentials)
             if (isAllowedToSignIn) {
                 return true
             } else {
@@ -66,23 +69,15 @@ export default NextAuth({
         },
         async jwt({ token, account, user }) {
             const isUserSignedIn = user ? true : false;
-            // console.log(isUserSignedIn)
-            // console.log('jwt user', user)
-            // console.log('jwt token', token)
-            // token['x-hasura-default-role'] = 'user'
-            // token['x-hasura-allowed-roles'] = ['user']
-            // token['x-hasura-user-id'] = token.email
+            if (isUserSignedIn) {
+                token.address = user?.address
+            }
             return token;
         },
         async session({ session, token, user }) {
             const encodedToken = sign(token, process.env.NEXTAUTH_SECRET, { algorithm: 'HS256'});
-            session.id = token.id;
             session.token = encodedToken;
-
-            // console.log('session', session)
-            // console.log('token', token)
-            // console.log('user', user)
-
+            session.address = token.address;
             return session
         }
     },
