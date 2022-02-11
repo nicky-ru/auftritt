@@ -22,7 +22,7 @@ export default NextAuth({
             },
             async authorize(credentials, req) {
 
-                const verifyRes = await fetch(`${publicConfig.NEXTAUTH_URL}api/verify`, {
+                const verifyRes = await fetch(`${publicConfig.NEXTAUTH_URL}/api/verify`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
