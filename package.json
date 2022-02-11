@@ -1,5 +1,5 @@
 {
-  "name": "halo-dashboard-v2",
+  "name": "auftritt",
   "private": true,
   "scripts": {
     "dev": "next dev",

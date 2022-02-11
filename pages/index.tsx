@@ -7,8 +7,8 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Halo Dashboard V2</title>
-        <meta name="description" content="Halo Dashboard V2" />
+        <title>Auftritt</title>
+        <meta name="description" content="A template for building dapps with Hasura GraphQL backend" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

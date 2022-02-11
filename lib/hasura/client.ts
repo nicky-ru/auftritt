@@ -7,9 +7,10 @@ import {
 import { setContext } from '@apollo/client/link/context';
 
 import { getSession } from "next-auth/react"
+import {publicConfig} from "../../config/publicConfig";
 
 const httpLink = createHttpLink({
-    uri: 'https://halodashv2.hasura.app/v1/graphql'
+    uri: publicConfig.HASURA_GRAPHQL_API
 });
 
 const authLink = setContext( async (_, { headers }) => {

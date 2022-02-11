@@ -2,14 +2,9 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import {useState} from "react";
 import {Button, Container, Text} from "@chakra-ui/react";
 
-import {client} from "../lib/hasura/client";
-
-import {
-    gql,
-} from "@apollo/client";
-
 import {useConnect, useAccount, useNetwork, useSignMessage} from "wagmi";
 import { SiweMessage } from 'siwe'
+import {Test} from "./Test";
 
 export default function Component() {
     const { data: session } = useSession()
@@ -70,21 +65,6 @@ export default function Component() {
         }
     }
 
-    const runqeury = async () => {
-        await client
-            .query({
-                query: gql`
-                  query GetTests {
-                      test {
-                        id
-                        name
-                      }
-                    }
-                `
-            })
-            .then(result => console.log(result));
-    }
-
     if (accountData) {
         return (
             <Container>
@@ -108,7 +88,7 @@ export default function Component() {
                         >
                             Sign Out
                         </Button>
-                        <Button onClick={runqeury}>tests</Button>
+                        <Test/>
                     </div>
                 ) : (
                     <Button ml={4} disabled={state.loading} onClick={smartSign}>
