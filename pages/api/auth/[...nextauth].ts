@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 // @ts-ignore
 import { sign, verify } from 'jsonwebtoken'
+import {publicConfig} from "../../../config/publicConfig";
 
 export default NextAuth({
     pages: {
@@ -21,7 +22,7 @@ export default NextAuth({
             },
             async authorize(credentials, req) {
 
-                const verifyRes = await fetch('http://localhost:3000/api/verify', {
+                const verifyRes = await fetch(`${publicConfig.NEXTAUTH_URL}api/verify`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
